@@ -1,14 +1,14 @@
 import Fastify from 'fastify';
+import fastifyPostgres from '@fastify/postgres';
+import formatShortURL from './utils/formatShortURL.js';
 
 const fastify = Fastify({
   logger: true,
 });
 
-const MOCK_SHORT_URL = {
-  id: 'dyAS3',
-  originalURL: 'https://someverylongurlhere.io',
-  visitCount: 142,
-};
+fastify.register(fastifyPostgres, {
+  connectionString: 'postgres://maxim@localhost/maxim',
+});
 
 // Receive a URL and generate a short URL
 fastify.post(
@@ -34,11 +34,18 @@ fastify.post(
       });
     }
 
+    const client = await fastify.pg.connect();
+    const { rows } = await client.query(
+      'SELECT id, original_url, visit_count FROM short_urls WHERE id=$1',
+      ['dyAS3']
+    );
+    const shortURL = formatShortURL(rows[0]);
+
     if (url === 'https://urlalreadyexists.io') {
-      return reply.code(200).send(MOCK_SHORT_URL);
+      return reply.code(200).send(shortURL);
     }
 
-    return reply.code(201).send(MOCK_SHORT_URL);
+    return reply.code(201).send(shortURL);
   }
 );
 
@@ -57,11 +64,19 @@ fastify.get(
   async (request, reply) => {
     const { id } = request.params;
 
-    if (id !== 'dyAS3') {
+    const client = await fastify.pg.connect();
+    const { rows } = await client.query(
+      'SELECT id, original_url, visit_count FROM short_urls WHERE id=$1',
+      [id]
+    );
+
+    if (rows.length === 0) {
       return reply.code(404).send();
     }
 
-    return reply.code(200).send(MOCK_SHORT_URL);
+    const shortURL = formatShortURL(rows[0]);
+
+    return reply.code(200).send(shortURL);
   }
 );
 
@@ -81,13 +96,21 @@ fastify.post(
   async (request, reply) => {
     const { id } = request.params;
 
-    if (id !== 'dyAS3') {
+    const client = await fastify.pg.connect();
+    const { rows } = await client.query(
+      'SELECT id, original_url, visit_count FROM short_urls WHERE id=$1',
+      [id]
+    );
+
+    if (rows.length === 0) {
       return reply.code(404).send();
     }
 
+    const shortURL = formatShortURL(rows[0]);
+
     return reply
       .code(200)
-      .send({ ...MOCK_SHORT_URL, visitCount: MOCK_SHORT_URL.visitCount + 1 });
+      .send({ ...shortURL, visitCount: shortURL.visitCount + 1 });
   }
 );
 
