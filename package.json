@@ -1,0 +1,19 @@
+{
+  "name": "url-shortener-backend",
+  "version": "1.0.0",
+  "description": "A back-end implementation for the URL Shortener project. More info: https://maximorlov.com/backend-portfolio-projects-no-css/",
+  "main": "index.js",
+  "type": "module",
+  "scripts": {
+    "dev": "nodemon index.js",
+    "start": "node index.js"
+  },
+  "author": "Maxim Orlov <maximorl@gmail.com> (https://github.com/Maximization)",
+  "license": "MIT",
+  "dependencies": {
+    "fastify": "4.12.0"
+  },
+  "devDependencies": {
+    "nodemon": "2.0.20"
+  }
+}
