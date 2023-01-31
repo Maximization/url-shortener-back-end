@@ -98,7 +98,7 @@ fastify.post(
 
     const client = await fastify.pg.connect();
     const { rows } = await client.query(
-      'SELECT id, original_url, visit_count FROM short_urls WHERE id=$1',
+      'UPDATE short_urls SET visit_count = visit_count + 1 WHERE id = $1 RETURNING *',
       [id]
     );
 
@@ -108,9 +108,7 @@ fastify.post(
 
     const shortURL = formatShortURL(rows[0]);
 
-    return reply
-      .code(200)
-      .send({ ...shortURL, visitCount: shortURL.visitCount + 1 });
+    return reply.code(200).send(shortURL);
   }
 );
 
