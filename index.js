@@ -11,61 +11,104 @@ const MOCK_SHORT_URL = {
 };
 
 // Receive a URL and generate a short URL
-fastify.post('/url', async (request, reply) => {
-  const { url } = request.body;
+fastify.post(
+  '/url',
+  {
+    schema: {
+      body: {
+        type: 'object',
+        required: ['url'],
+        properties: { url: { type: 'string' } },
+      },
+    },
+  },
+  async (request, reply) => {
+    const { url } = request.body;
 
-  if (url === 'https://localhost:3000/dyAS3') {
-    return reply
-      .code(400)
-      .header('Content-Type', 'application/json; charset=utf-8')
-      .send({
+    if (url === 'https://localhost:3000/dyAS3') {
+      return reply.code(400).send({
         error: {
           message:
             'This URL is already a short URL. Please use an unshortened URL.',
         },
       });
-  }
+    }
 
-  if (url === 'https://urlalreadyexists.io') {
-    return reply
-      .code(200)
-      .header('Content-Type', 'application/json; charset=utf-8')
-      .send(MOCK_SHORT_URL);
-  }
+    if (url === 'https://urlalreadyexists.io') {
+      return reply.code(200).send(MOCK_SHORT_URL);
+    }
 
-  return reply
-    .code(201)
-    .header('Content-Type', 'application/json; charset=utf-8')
-    .send(MOCK_SHORT_URL);
-});
+    return reply.code(201).send(MOCK_SHORT_URL);
+  }
+);
 
 // Retrieve a short URL (without incrementing the visit count)
-fastify.get('/url/:id', async (request, reply) => {
-  const { id } = request.params;
+fastify.get(
+  '/url/:id',
+  {
+    schema: {
+      params: {
+        type: 'object',
+        required: ['id'],
+        properties: { id: { type: 'string' } },
+      },
+    },
+  },
+  async (request, reply) => {
+    const { id } = request.params;
 
-  if (id !== 'dyAS3') {
-    return reply.code(404).send();
+    if (id !== 'dyAS3') {
+      return reply.code(404).send();
+    }
+
+    return reply.code(200).send(MOCK_SHORT_URL);
   }
-
-  return reply
-    .code(200)
-    .header('Content-Type', 'application/json; charset=utf-8')
-    .send(MOCK_SHORT_URL);
-});
+);
 
 // Retrieve short URL for the purpose of redirecting user to original URL.
 // Should increment visit count by 1
-fastify.post('/url/:id/visit', async (request, reply) => {
-  const { id } = request.params;
+fastify.post(
+  '/url/:id/visit',
+  {
+    schema: {
+      params: {
+        type: 'object',
+        required: ['id'],
+        properties: { id: { type: 'string' } },
+      },
+    },
+  },
+  async (request, reply) => {
+    const { id } = request.params;
 
-  if (id !== 'dyAS3') {
-    return reply.code(404).send();
+    if (id !== 'dyAS3') {
+      return reply.code(404).send();
+    }
+
+    return reply
+      .code(200)
+      .send({ ...MOCK_SHORT_URL, visitCount: MOCK_SHORT_URL.visitCount + 1 });
+  }
+);
+
+fastify.setErrorHandler(function (error, request, reply) {
+  const {
+    error: { statusCode },
+  } = { error };
+
+  if (statusCode >= 500) {
+    this.log.error(error);
+  } else if (statusCode >= 400) {
+    this.log.info({ err: error }, 'Validation error');
+  } else {
+    this.log.error(error);
   }
 
-  return reply
-    .code(200)
-    .header('Content-Type', 'application/json; charset=utf-8')
-    .send({ ...MOCK_SHORT_URL, visitCount: MOCK_SHORT_URL.visitCount + 1 });
+  if (error.validation) {
+    return reply.code(400).send({ error: { message: error.message } });
+  }
+
+  return reply.send(error);
 });
 
 try {
