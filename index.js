@@ -129,7 +129,9 @@ fastify.setErrorHandler(function (error, request, reply) {
     return reply.code(400).send({ error: { message: error.message } });
   }
 
-  return reply.send(error);
+  return reply
+    .code(500)
+    .send({ error: { message: 'An unknown error occurred.' } });
 });
 
 try {
