@@ -1,6 +1,12 @@
 import Fastify from 'fastify';
 import fastifyPostgres from '@fastify/postgres';
+import { customAlphabet } from 'nanoid';
 import formatShortURL from './utils/formatShortURL.js';
+
+const nanoid = customAlphabet(
+  '0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz',
+  5
+);
 
 const fastify = Fastify({
   logger: true,
@@ -36,16 +42,24 @@ fastify.post(
 
     const client = await fastify.pg.connect();
     const { rows } = await client.query(
-      'SELECT id, original_url, visit_count FROM short_urls WHERE id=$1',
-      ['dyAS3']
+      'SELECT id, original_url, visit_count FROM short_urls WHERE original_url = $1',
+      [url]
     );
-    const shortURL = formatShortURL(rows[0]);
 
-    if (url === 'https://urlalreadyexists.io') {
+    if (rows.length !== 0) {
+      const shortURL = formatShortURL(rows[0]);
       return reply.code(200).send(shortURL);
     }
 
-    return reply.code(201).send(shortURL);
+    const id = nanoid();
+    const { rows: newRows } = await client.query(
+      'INSERT INTO short_urls (id, original_url) VALUES ($1, $2) RETURNING *',
+      [id, url]
+    );
+
+    const newShortURL = formatShortURL(newRows[0]);
+
+    return reply.code(201).send(newShortURL);
   }
 );
 
@@ -66,7 +80,7 @@ fastify.get(
 
     const client = await fastify.pg.connect();
     const { rows } = await client.query(
-      'SELECT id, original_url, visit_count FROM short_urls WHERE id=$1',
+      'SELECT id, original_url, visit_count FROM short_urls WHERE id = $1',
       [id]
     );
 
