@@ -42,8 +42,12 @@ const schema = {
 async function handler(request, reply) {
   const { url } = request.body;
 
-  // TODO avoid shortening shortened URLs
-  if (url === 'https://localhost:3000/dyAS3') {
+  const { hostname } = new URL(url);
+  const clientHostname = request.hostname.includes(':')
+    ? request.hostname.split(':')[0]
+    : request.hostname;
+
+  if (hostname === clientHostname) {
     return reply.code(400).send({
       error: {
         message:
