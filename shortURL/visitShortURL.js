@@ -3,7 +3,7 @@
  * Should increment visit count by 1.
  */
 
-import formatShortURL from '../utils/formatShortURL.js';
+import formatShortURL from '../helpers/formatShortURL.js';
 
 const schema = {
   params: {

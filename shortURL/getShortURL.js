@@ -2,7 +2,7 @@
  * Retrieve a short URL (without incrementing the visit count)
  */
 
-import formatShortURL from '../utils/formatShortURL.js';
+import formatShortURL from '../helpers/formatShortURL.js';
 
 const schema = {
   params: {

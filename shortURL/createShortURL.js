@@ -3,7 +3,7 @@
  */
 
 import { customAlphabet } from 'nanoid';
-import formatShortURL from '../utils/formatShortURL.js';
+import formatShortURL from '../helpers/formatShortURL.js';
 
 const nanoid = customAlphabet(
   '0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz', // base62
