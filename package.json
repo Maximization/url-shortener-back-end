@@ -12,6 +12,7 @@
   "license": "MIT",
   "dependencies": {
     "@fastify/postgres": "5.2.0",
+    "dotenv": "16.0.3",
     "fastify": "4.12.0",
     "nanoid": "4.0.0",
     "pg": "8.9.0"

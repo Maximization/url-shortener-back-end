@@ -1,3 +1,6 @@
+import * as dotenv from 'dotenv';
+dotenv.config();
+
 import Fastify from 'fastify';
 import fastifyPostgres from '@fastify/postgres';
 import shortURL from './shortURL/index.js';
@@ -7,7 +10,7 @@ const fastify = Fastify({
 });
 
 fastify.register(fastifyPostgres, {
-  connectionString: 'postgres://maxim@localhost/maxim',
+  connectionString: process.env.POSTGRES_URI,
 });
 
 fastify.register(shortURL);
