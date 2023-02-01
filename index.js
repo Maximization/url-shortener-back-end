@@ -6,7 +6,18 @@ import fastifyPostgres from '@fastify/postgres';
 import shortURL from './shortURL/index.js';
 
 const fastify = Fastify({
-  logger: true,
+  logger:
+    process.env.NODE_ENV === 'development'
+      ? {
+          transport: {
+            target: 'pino-pretty',
+            options: {
+              translateTime: 'HH:MM:ss Z',
+              ignore: 'pid,hostname',
+            },
+          },
+        }
+      : true,
 });
 
 fastify.register(fastifyPostgres, {

@@ -18,6 +18,7 @@
     "pg": "8.9.0"
   },
   "devDependencies": {
-    "nodemon": "2.0.20"
+    "nodemon": "2.0.20",
+    "pino-pretty": "9.1.1"
   }
 }
