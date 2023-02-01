@@ -36,21 +36,18 @@ const schema = {
 async function handler(request, reply) {
   const { id } = request.params;
 
-  const client = await this.pg.connect();
-  const { rows } = await client.query(
-    'SELECT id, original_url, visit_count FROM short_urls WHERE id = $1',
-    [id]
+  const shortURL = await this.db.oneOrNone(
+    'SELECT id, original_url, visit_count FROM short_urls WHERE id = ${id}',
+    { id }
   );
 
-  if (rows.length === 0) {
+  if (!shortURL) {
     return reply
       .code(404)
       .send({ error: { message: "The short URL doesn't exist" } });
   }
 
-  const shortURL = formatShortURL(rows[0]);
-
-  return reply.code(200).send(shortURL);
+  return reply.code(200).send(formatShortURL(shortURL));
 }
 
 export default async (fastify) => {

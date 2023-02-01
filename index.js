@@ -2,7 +2,8 @@ import * as dotenv from 'dotenv';
 dotenv.config();
 
 import Fastify from 'fastify';
-import fastifyPostgres from '@fastify/postgres';
+import fastifyPlugin from 'fastify-plugin';
+import pgPromise from 'pg-promise';
 import shortURL from './shortURL/index.js';
 
 const fastify = Fastify({
@@ -20,9 +21,13 @@ const fastify = Fastify({
       : true,
 });
 
-fastify.register(fastifyPostgres, {
-  connectionString: process.env.POSTGRES_URI,
-});
+fastify.register(
+  fastifyPlugin(async (fastify) => {
+    const pgp = pgPromise();
+    const db = pgp(process.env.POSTGRES_URI);
+    fastify.decorate('db', db);
+  })
+);
 
 fastify.register(shortURL);
 

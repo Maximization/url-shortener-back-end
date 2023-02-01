@@ -56,26 +56,22 @@ async function handler(request, reply) {
     });
   }
 
-  const client = await this.pg.connect();
-  const { rows } = await client.query(
+  const shortURL = await this.db.oneOrNone(
     'SELECT id, original_url, visit_count FROM short_urls WHERE original_url = $1',
     [url]
   );
 
-  if (rows.length !== 0) {
-    const shortURL = formatShortURL(rows[0]);
-    return reply.code(200).send(shortURL);
+  if (shortURL) {
+    return reply.code(200).send(formatShortURL(shortURL));
   }
 
   const id = nanoid();
-  const { rows: newRows } = await client.query(
+  const newShortURL = await this.db.one(
     'INSERT INTO short_urls (id, original_url) VALUES ($1, $2) RETURNING *',
     [id, url]
   );
 
-  const newShortURL = formatShortURL(newRows[0]);
-
-  return reply.code(201).send(newShortURL);
+  return reply.code(201).send(formatShortURL(newShortURL));
 }
 
 export default async (fastify) => {
