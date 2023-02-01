@@ -37,7 +37,7 @@ async function handler(request, reply) {
   const { id } = request.params;
 
   const shortURL = await this.db.oneOrNone(
-    'SELECT id, original_url, visit_count FROM short_urls WHERE id = ${id}',
+    'SELECT id, original_url, visit_count FROM short_urls WHERE id = $<id>',
     { id }
   );
 

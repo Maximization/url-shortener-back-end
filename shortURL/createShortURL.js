@@ -57,8 +57,8 @@ async function handler(request, reply) {
   }
 
   const shortURL = await this.db.oneOrNone(
-    'SELECT id, original_url, visit_count FROM short_urls WHERE original_url = $1',
-    [url]
+    'SELECT id, original_url, visit_count FROM short_urls WHERE original_url = $<url>',
+    { url }
   );
 
   if (shortURL) {
@@ -67,8 +67,8 @@ async function handler(request, reply) {
 
   const id = nanoid();
   const newShortURL = await this.db.one(
-    'INSERT INTO short_urls (id, original_url) VALUES ($1, $2) RETURNING *',
-    [id, url]
+    'INSERT INTO short_urls (id, original_url) VALUES ($<id>, $<url>) RETURNING *',
+    { id, url }
   );
 
   return reply.code(201).send(formatShortURL(newShortURL));

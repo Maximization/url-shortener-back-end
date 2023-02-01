@@ -38,7 +38,7 @@ async function handler(request, reply) {
   const { id } = request.params;
 
   const shortURL = await this.db.oneOrNone(
-    'UPDATE short_urls SET visit_count = visit_count + 1 WHERE id = ${id} RETURNING *',
+    'UPDATE short_urls SET visit_count = visit_count + 1 WHERE id = $<id> RETURNING *',
     { id }
   );
 
