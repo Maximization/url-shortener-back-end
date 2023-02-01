@@ -49,7 +49,7 @@ fastify.setErrorHandler(function (error, request, reply) {
 });
 
 try {
-  await fastify.listen({ port: 8000 });
+  await fastify.listen({ port: process.env.PORT });
 } catch (error) {
   fastify.log.error(error);
   process.exit(1);
