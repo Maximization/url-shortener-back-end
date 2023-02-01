@@ -6,7 +6,7 @@ import { customAlphabet } from 'nanoid';
 import formatShortURL from '../utils/formatShortURL.js';
 
 const nanoid = customAlphabet(
-  '0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz',
+  '0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz', // base62
   5
 );
 
@@ -16,11 +16,33 @@ const schema = {
     required: ['url'],
     properties: { url: { type: 'string' } },
   },
+  response: {
+    default: {
+      type: 'object',
+      properties: {
+        error: {
+          type: 'object',
+          required: ['message'],
+          properties: { message: { type: 'string' } },
+        },
+      },
+    },
+    '2xx': {
+      type: 'object',
+      required: ['id', 'originalURL', 'visitCount'],
+      properties: {
+        id: { type: 'string' },
+        originalURL: { type: 'string' },
+        visitCount: { type: 'number' },
+      },
+    },
+  },
 };
 
 async function handler(request, reply) {
   const { url } = request.body;
 
+  // TODO avoid shortening shortened URLs
   if (url === 'https://localhost:3000/dyAS3') {
     return reply.code(400).send({
       error: {

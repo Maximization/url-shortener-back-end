@@ -10,6 +10,27 @@ const schema = {
     required: ['id'],
     properties: { id: { type: 'string' } },
   },
+  response: {
+    default: {
+      type: 'object',
+      properties: {
+        error: {
+          type: 'object',
+          required: ['message'],
+          properties: { message: { type: 'string' } },
+        },
+      },
+    },
+    200: {
+      type: 'object',
+      required: ['id', 'originalURL', 'visitCount'],
+      properties: {
+        id: { type: 'string' },
+        originalURL: { type: 'string' },
+        visitCount: { type: 'number' },
+      },
+    },
+  },
 };
 
 async function handler(request, reply) {
@@ -22,7 +43,9 @@ async function handler(request, reply) {
   );
 
   if (rows.length === 0) {
-    return reply.code(404).send();
+    return reply
+      .code(404)
+      .send({ error: { message: "The short URL doesn't exist" } });
   }
 
   const shortURL = formatShortURL(rows[0]);
