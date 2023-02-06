@@ -9,7 +9,6 @@
     "start": "node index.js"
   },
   "author": "Maxim Orlov <maximorl@gmail.com> (https://github.com/Maximization)",
-  "license": "MIT",
   "dependencies": {
     "dotenv": "16.0.3",
     "fastify": "4.12.0",
