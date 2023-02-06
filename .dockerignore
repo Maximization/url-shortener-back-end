@@ -1,0 +1,9 @@
+fly.toml
+Dockerfile
+.dockerignore
+node_modules
+.git
+.gitignore
+.env.example
+fly/apps/postgres/fly.toml
+README.md

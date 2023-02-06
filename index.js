@@ -54,7 +54,10 @@ fastify.setErrorHandler(function (error, request, reply) {
 });
 
 try {
-  await fastify.listen({ port: process.env.PORT });
+  await fastify.listen({
+    port: process.env.PORT,
+    host: process.env.NODE_ENV === 'development' ? 'localhost' : '0.0.0.0',
+  });
 } catch (error) {
   fastify.log.error(error);
   process.exit(1);

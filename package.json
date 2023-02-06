@@ -1,5 +1,5 @@
 {
-  "name": "url-shortener-backend",
+  "name": "url-shortener-back-end",
   "version": "1.0.0",
   "description": "A back-end implementation for the URL Shortener project. More info: https://maximorlov.com/backend-portfolio-projects-no-css/",
   "main": "index.js",
